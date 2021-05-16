@@ -6,7 +6,8 @@
 # Add Hit "ENTER" to start and stop trace
 # Add Elevated permission check
 # Removed tracing FOR loop
-
+# Add code to remove any previous NetEventSessions
+#
 Write-Host ""
 Write-Host "Checking for elevated permissions..." -ForegroundColor Yellow
 Write-Host ""
@@ -26,6 +27,9 @@ If(!(test-path $path))
 {
 New-Item -ItemType Directory -Force -Path $path
 }
+#Remove any previous NetEventCapture sessions
+Stop-NetEventSession -name NetCap42 -ErrorAction SilentlyContinue
+Remove-NetEventSession -Name NetCap42 -ErrorAction SilentlyContinue
 
 #this next line will gather computername as well as the time and format it with the following Computername Day-24hr Minute (This is at the START of the capture session)
 Write-Host ""
