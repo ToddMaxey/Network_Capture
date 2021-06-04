@@ -1,4 +1,4 @@
-<#Header - Lex Thomas, Keith Ramphal Net Session Capture in Powershell. Modified by Todd Maxey#>
+<#Header - Lex Thomas, Keith Ramphal Net Session Capture in Powershell. Modified by Todd Maxey and Muath Deeb#>
 # Add - Full frame capture by removing -Truncationlength 512
 # Add - Wait till ENTER is pressed to stop trace
 # Add - ARP cache and Kerberos ticket purge
@@ -7,6 +7,9 @@
 # Add Elevated permission check
 # Removed tracing FOR loop
 # Add code to remove any previous NetEventSessions
+# Moved Start-NetEventSession -Name NetCap42 to after the user hits ENTER to start the trace. Previously the trace was starting before we flushed the caches
+# Adding new line to flush ALL Kerberos tickets on the machine - Get-WmiObject Win32_LogonSession | Where-Object {$_.AuthenticationPackage -ne 'NTLM'} | ForEach-Object {klist.exe purge -li ([Convert]::ToString($_.LogonId, 16))} - Muath Deeb
+# Moving the resolver cache and Kerberos flush to just after starting the network trace so we can pick up this traffic
 #
 Write-Host ""
 Write-Host "Checking for elevated permissions..." -ForegroundColor Yellow
@@ -19,7 +22,7 @@ Break
 }
 else {
 Write-Host ""
-Write-Host "Code is running as administrator ó go on executing the script..." -ForegroundColor Green
+Write-Host "Code is running as administrator ‚Äî go on executing the script..." -ForegroundColor Green
 Write-Host ""
 }
 $path = "C:\temp\capture\"
@@ -36,6 +39,12 @@ Write-Host ""
 Write-Host "Creating capture session" -ForegroundColor Yellow
 New-NetEventSession -Name NetCap42 -LocalFilePath c:\temp\Capture\$env:computername" "$(get-date -f dddd-MMMM-dd-yyyy-HH.mm.ss).etl
 Add-NetEventPacketCaptureProvider -SessionName NetCap42 -Truncationlength 65535
+
+Write-Host ""
+Write-Host ‚ÄúPress ENTER start capture session‚Äù -ForegroundColor Yellow
+
+Read-Host " "
+Write-host "Please reproduce issue NOW." -ForegroundColor Green
 Start-NetEventSession -Name NetCap42
 
 #Flush all resolver caches
@@ -46,16 +55,18 @@ Arp -d *
 Nbtstat -RR
 
 #flush kerberos tickets for user and machine
-Klist purge
-klist -li 0x3e7 purge  #machine
+#Klist purge
+#klist -li 0x3e7 purge  #machine
+Get-WmiObject Win32_LogonSession | Where-Object {$_.AuthenticationPackage -ne 'NTLM'} | ForEach-Object {klist.exe purge -li ([Convert]::ToString($_.LogonId, 16))}
 
 Write-Host ""
-Write-Host ìPress ENTER start capture sessionî -ForegroundColor Yellow
+Write-Host ‚ÄúPress ENTER start capture session‚Äù -ForegroundColor Yellow
 
 Read-Host " "
 Write-host "Please reproduce issue NOW." -ForegroundColor Green
+Start-NetEventSession -Name NetCap42
 Write-Host ""
-Write-Host ìPress ENTER to stop capture session when reproduction is completeî -ForegroundColor Yellow
+Write-Host ‚ÄúPress ENTER to stop capture session when reproduction is complete‚Äù -ForegroundColor Yellow
 Read-Host " "
 Write-Host "Retrive your ETL trace file @ $path"  -ForegroundColor Yellow
 Write-Host "Opening Explorer to $path"  -ForegroundColor Yellow
