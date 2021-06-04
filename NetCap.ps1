@@ -10,6 +10,7 @@
 # Moved Start-NetEventSession -Name NetCap42 to after the user hits ENTER to start the trace. Previously the trace was starting before we flushed the caches
 # Adding new line to flush ALL Kerberos tickets on the machine - Get-WmiObject Win32_LogonSession | Where-Object {$_.AuthenticationPackage -ne 'NTLM'} | ForEach-Object {klist.exe purge -li ([Convert]::ToString($_.LogonId, 16))} - Muath Deeb
 # Moving the resolver cache and Kerberos flush to just after starting the network trace so we can pick up this traffic
+# Added a Netstat -anob output file to corrlate the PID in the trace note to an executable 
 #
 Write-Host ""
 Write-Host "Checking for elevated permissions..." -ForegroundColor Yellow
@@ -22,7 +23,7 @@ Break
 }
 else {
 Write-Host ""
-Write-Host "Code is running as administrator — go on executing the script..." -ForegroundColor Green
+Write-Host "Code is running as administrator - go on executing the script..." -ForegroundColor Green
 Write-Host ""
 }
 $path = "C:\temp\capture\"
@@ -41,11 +42,8 @@ New-NetEventSession -Name NetCap42 -LocalFilePath c:\temp\Capture\$env:computern
 Add-NetEventPacketCaptureProvider -SessionName NetCap42 -Truncationlength 65535
 
 Write-Host ""
-Write-Host “Press ENTER start capture session” -ForegroundColor Yellow
-
+Write-Host "Press ENTER start capture session"� -ForegroundColor Yellow
 Read-Host " "
-Write-host "Please reproduce issue NOW." -ForegroundColor Green
-Start-NetEventSession -Name NetCap42
 
 #Flush all resolver caches
 Write-Host ""
@@ -59,15 +57,14 @@ Nbtstat -RR
 #klist -li 0x3e7 purge  #machine
 Get-WmiObject Win32_LogonSession | Where-Object {$_.AuthenticationPackage -ne 'NTLM'} | ForEach-Object {klist.exe purge -li ([Convert]::ToString($_.LogonId, 16))}
 
+#Read-Host " "
 Write-Host ""
-Write-Host “Press ENTER start capture session” -ForegroundColor Yellow
-
-Read-Host " "
 Write-host "Please reproduce issue NOW." -ForegroundColor Green
 Start-NetEventSession -Name NetCap42
 Write-Host ""
-Write-Host “Press ENTER to stop capture session when reproduction is complete” -ForegroundColor Yellow
+Write-Host "Press ENTER to stop capture session when reproduction is complete"� -ForegroundColor Yellow
 Read-Host " "
+netstat -anob > c:\temp\Capture\$env:computername" Netstat "$(get-date -f dddd-MMMM-dd-yyyy-HH.mm.ss).txt
 Write-Host "Retrive your ETL trace file @ $path"  -ForegroundColor Yellow
 Write-Host "Opening Explorer to $path"  -ForegroundColor Yellow
 Stop-NetEventSession -name NetCap42
