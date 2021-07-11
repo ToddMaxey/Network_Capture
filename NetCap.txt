@@ -15,18 +15,28 @@
 Write-Host ""
 Write-Host "Checking for elevated permissions..." -ForegroundColor Yellow
 Write-Host ""
-if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(`
-[Security.Principal.WindowsBuiltInRole] "Administrator")) {
-Write-Host "Insufficient permissions to run this script. Open the PowerShell console as an administrator and run this script again." -ForegroundColor Red
-Write-Host ""
-Break
+#[Security.Principal.WindowsBuiltInRole] "Administrator")) {
+#Write-Host "Insufficient permissions to run this script. Open the PowerShell console as an administrator and run this script again." -ForegroundColor Red
+#Write-Host ""
+#Break
+#}
+#else {
+#Write-Host ""
+#Write-Host "Code is running as administrator - go on executing the script..." -ForegroundColor Green
+#Write-Host ""
+#}
+# Self-elevate the script if required
+if (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator'))
+{
+ if ([int](Get-CimInstance -Class Win32_OperatingSystem | Select-Object -ExpandProperty BuildNumber) -ge 6000) {
+  $CommandLine = "-File `"" + $MyInvocation.MyCommand.Path + "`" " + $MyInvocation.UnboundArguments
+  Start-Process -FilePath PowerShell.exe -Verb Runas -ArgumentList $CommandLine
+  Exit
+ }
 }
-else {
-Write-Host ""
-Write-Host "Code is running as administrator - go on executing the script..." -ForegroundColor Green
-Write-Host ""
-}
+#Where we write the captured data
 $path = "C:\temp\capture\"
+#Is the path does not exist, create it
 If(!(test-path $path))
 {
 New-Item -ItemType Directory -Force -Path $path
