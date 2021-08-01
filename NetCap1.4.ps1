@@ -1,3 +1,44 @@
+
+<#PSScriptInfo
+
+.VERSION 1.4
+
+.GUID cecc1f48-fc57-4fa9-b74c-4eb2be4d6602
+
+.AUTHOR Todd Maxey
+
+.COMPANYNAME
+
+.COPYRIGHT
+
+.TAGS
+
+.LICENSEURI
+
+.PROJECTURI
+
+.ICONURI
+
+.EXTERNALMODULEDEPENDENCIES 
+
+.REQUIREDSCRIPTS
+
+.EXTERNALSCRIPTDEPENDENCIES
+
+.RELEASENOTES
+
+
+.PRIVATEDATA
+
+#>
+
+<# 
+
+.DESCRIPTION 
+ Take a network packet capture On Windows Vista and later operating systems using PowerShell 
+
+#> 
+Param()
 <#Header - Lex Thomas, Keith Ramphal Net Session Capture in Powershell. Modified by Todd Maxey and Muath Deeb#>
 # Add - Full frame capture by removing -Truncationlength 512
 # Add - Wait till ENTER is pressed to stop trace
@@ -85,3 +126,4 @@ Start-sleep -s 5
 explorer $path
 
 Exit
+
