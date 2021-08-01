@@ -96,6 +96,8 @@ Write-Host ""
 Write-Host "Press ENTER start capture session"ù -ForegroundColor Yellow
 Read-Host " "
 
+Start-NetEventSession -Name NetCap42
+
 #Flush all resolver caches
 Write-Host ""
 Write-Host "Flushing DNS, NetBIOS, ARP and Kerberos caches" -ForegroundColor Yellow
@@ -111,7 +113,6 @@ Get-WmiObject Win32_LogonSession | Where-Object {$_.AuthenticationPackage -ne 'N
 #Read-Host " "
 Write-Host ""
 Write-host "Please reproduce issue NOW." -ForegroundColor Green
-Start-NetEventSession -Name NetCap42
 Write-Host ""
 Write-Host "Press ENTER to stop capture session when reproduction is complete"ù -ForegroundColor Yellow
 Read-Host " "
