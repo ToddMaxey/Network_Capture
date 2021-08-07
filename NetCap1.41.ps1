@@ -1,3 +1,44 @@
+
+<#PSScriptInfo
+
+.VERSION 1.41
+
+.GUID cecc1f48-fc57-4fa9-b74c-4eb2be4d6602
+
+.AUTHOR Todd Maxey
+
+.COMPANYNAME Microsoft
+
+.COPYRIGHT 2021
+
+.TAGS
+
+.LICENSEURI
+
+.PROJECTURI
+
+.ICONURI
+
+.EXTERNALMODULEDEPENDENCIES 
+
+.REQUIREDSCRIPTS
+
+.EXTERNALSCRIPTDEPENDENCIES
+
+.RELEASENOTES
+
+
+.PRIVATEDATA
+
+#>
+
+<# 
+
+.DESCRIPTION 
+ Take a network packet capture On Windows Vista and later operating systems using PowerShell 
+
+#> 
+Param()
 <#Header - Lex Thomas, Keith Ramphal Net Session Capture in Powershell. Modified by Todd Maxey and Muath Deeb#>
 # Add - Full frame capture by removing -Truncationlength 512
 # Add - Wait till ENTER is pressed to stop trace
@@ -55,6 +96,8 @@ Write-Host ""
 Write-Host "Press ENTER start capture session" -ForegroundColor Yellow
 Read-Host " "
 
+Start-NetEventSession -Name NetCap42
+
 #Flush all resolver caches
 Write-Host ""
 Write-Host "Flushing DNS, NetBIOS, ARP and Kerberos caches" -ForegroundColor Yellow
@@ -67,13 +110,19 @@ Nbtstat -RR
 #klist -li 0x3e7 purge  #machine
 Get-WmiObject Win32_LogonSession | Where-Object {$_.AuthenticationPackage -ne 'NTLM'} | ForEach-Object {klist.exe purge -li ([Convert]::ToString($_.LogonId, 16))}
 
+#Make a token connection to login.microsoftonline.com
+Invoke-WebRequest -Uri https://login.microsoftonline.com
+
 #Read-Host " "
 Write-Host ""
 Write-host "Please reproduce issue NOW." -ForegroundColor Green
-Start-NetEventSession -Name NetCap42
 Write-Host ""
 Write-Host "Press ENTER to stop capture session when reproduction is complete" -ForegroundColor Yellow
 Read-Host " "
+
+#Make a token connection to login.microsoftonline.com
+Invoke-WebRequest -Uri https://login.microsoftonline.com
+
 netstat -anob > c:\temp\Capture\$env:computername" Netstat "$(get-date -f dddd-MMMM-dd-yyyy-HH.mm.ss).txt
 Write-Host "Retrive your ETL trace file @ $path"  -ForegroundColor Yellow
 Write-Host "Opening Explorer to $path"  -ForegroundColor Yellow
@@ -85,3 +134,4 @@ Start-sleep -s 5
 explorer $path
 
 Exit
+
