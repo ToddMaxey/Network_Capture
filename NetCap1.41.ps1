@@ -96,7 +96,7 @@ New-NetEventSession -Name NetCap42 -LocalFilePath c:\temp\Capture\$env:computern
 Add-NetEventPacketCaptureProvider -SessionName NetCap42 -Truncationlength 65535
 
 Write-Host ""
-Write-Host "Press ENTER start capture session"Â -ForegroundColor Yellow
+Write-Host "Press ENTER start capture session" -ForegroundColor Yellow
 Read-Host " "
 
 Start-NetEventSession -Name NetCap42
@@ -114,17 +114,17 @@ Nbtstat -RR
 Get-WmiObject Win32_LogonSession | Where-Object {$_.AuthenticationPackage -ne 'NTLM'} | ForEach-Object {klist.exe purge -li ([Convert]::ToString($_.LogonId, 16))}
 
 #Make a token connection to login.microsoftonline.com
-Invoke-WebRequest -Uri https://login.microsoftonline.com
+Invoke-WebRequest -Uri https://login.microsoftonline.com -MaximumRedirection 0 -ErrorAction SilentlyContinue
 
 #Read-Host " "
 Write-Host ""
 Write-host "Please reproduce issue NOW." -ForegroundColor Green
 Write-Host ""
-Write-Host "Press ENTER to stop capture session when reproduction is complete"Â -ForegroundColor Yellow
+Write-Host "Press ENTER to stop capture session when reproduction is complete" -ForegroundColor Yellow
 Read-Host " "
 
 #Make a token connection to login.microsoftonline.com
-Invoke-WebRequest -Uri https://login.microsoftonline.com
+Invoke-WebRequest -Uri https://login.microsoftonline.com -MaximumRedirection 0 -ErrorAction SilentlyContinue
 Get-Event | format-table -autosize timegenerated, @{L='Process ID' ; E = {$_.sourceeventargs.newevent.processid}}, @{L='PID' ; E = {$_.sourceeventargs.newevent.processname}} > c:\temp\Capture\$env:computername" New Process PID "$(get-date -f dddd-MMMM-dd-yyyy-HH.mm.ss).txt
 get-event | Remove-Event
 get-event | Remove-Event
