@@ -96,7 +96,7 @@ New-NetEventSession -Name NetCap42 -LocalFilePath c:\temp\Capture\$env:computern
 Add-NetEventPacketCaptureProvider -SessionName NetCap42 -Truncationlength 65535
 
 Write-Host ""
-Write-Host "Press ENTER start capture session"ù -ForegroundColor Yellow
+Write-Host "Press ENTER start capture session"¬ù -ForegroundColor Yellow
 Read-Host " "
 
 Start-NetEventSession -Name NetCap42
@@ -120,7 +120,7 @@ Invoke-WebRequest -Uri https://login.microsoftonline.com
 Write-Host ""
 Write-host "Please reproduce issue NOW." -ForegroundColor Green
 Write-Host ""
-Write-Host "Press ENTER to stop capture session when reproduction is complete"ù -ForegroundColor Yellow
+Write-Host "Press ENTER to stop capture session when reproduction is complete"¬ù -ForegroundColor Yellow
 Read-Host " "
 
 #Make a token connection to login.microsoftonline.com
