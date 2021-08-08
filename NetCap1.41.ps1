@@ -86,6 +86,9 @@ New-Item -ItemType Directory -Force -Path $path
 Stop-NetEventSession -name NetCap42 -ErrorAction SilentlyContinue
 Remove-NetEventSession -Name NetCap42 -ErrorAction SilentlyContinue
 
+#Add process event catcher to record any PID's during the trace that might have been started and destroyed before the netstat data is gathered
+Register-CimIndicationEvent -ClassName Win32_ProcessTrace -SourceIdentifier "ProcessStarted"
+
 #this next line will gather computername as well as the time and format it with the following Computername Day-24hr Minute (This is at the START of the capture session)
 Write-Host ""
 Write-Host "Creating capture session" -ForegroundColor Yellow
@@ -122,7 +125,10 @@ Read-Host " "
 
 #Make a token connection to login.microsoftonline.com
 Invoke-WebRequest -Uri https://login.microsoftonline.com
-
+Get-Event | format-table -autosize timegenerated, @{L='Process ID' ; E = {$_.sourceeventargs.newevent.processid}}, @{L='PID' ; E = {$_.sourceeventargs.newevent.processname}} > c:\temp\Capture\$env:computername" New Process PID "$(get-date -f dddd-MMMM-dd-yyyy-HH.mm.ss).txt
+get-event | Remove-Event
+get-event | Remove-Event
+Get-EventSubscriber | Unregister-Event
 netstat -anob > c:\temp\Capture\$env:computername" Netstat "$(get-date -f dddd-MMMM-dd-yyyy-HH.mm.ss).txt
 Write-Host "Retrive your ETL trace file @ $path"  -ForegroundColor Yellow
 Write-Host "Opening Explorer to $path"  -ForegroundColor Yellow
@@ -134,4 +140,3 @@ Start-sleep -s 5
 explorer $path
 
 Exit
-
